@@ -61,8 +61,17 @@ def load_data():
         df['Date'] = pd.to_datetime(df['Date'])
         return df
     except FileNotFoundError:
-        st.error("Fichier de données introuvable. Exécutez 'data_generator.py' d'abord.")
-        return pd.DataFrame()
+        import data_generator
+        with st.spinner("Génération automatique du jeu de données pour la première utilisation..."):
+            data_generator.generate_data()
+        # On relit après génération
+        try:
+            df = pd.read_csv(file_path)
+            df['Date'] = pd.to_datetime(df['Date'])
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors de la génération des données : {e}")
+            return pd.DataFrame()
 
 df_raw = load_data()
 
